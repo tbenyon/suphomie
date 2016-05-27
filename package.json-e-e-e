@@ -1,0 +1,17 @@
+{
+  "name": "templateproject",
+  "version": "1.0.0",
+  "description": "just a template project",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.0.2",
+    "cookie-parser": "~1.0.0",
+    "express": "^4.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
