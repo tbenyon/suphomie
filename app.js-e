@@ -7,7 +7,31 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'testUser',
+    password : 'password',
+    database : 'suphomie'
+});
 
+connection.connect();
+var post  = {comment: 'Server executed.'};
+connection.query('INSERT INTO log SET ?', post, function(err, result) {
+    if (!err)
+        console.log('The result is: ', result);
+    else
+        console.log('Error while performing log insert.');
+});
+
+connection.query('SELECT * from log', function(err, rows, fields) {
+    if (!err)
+        console.log('The solution is: ', rows);
+    else
+        console.log('Error while performing Query.');
+});
+
+connection.end();
 
 
 
