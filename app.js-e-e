@@ -24,12 +24,17 @@ var printAllImageData = function () {
     });
 };
 
-var addImageDataToDB = function (imageData) {
+var addImageDataToDB = function (res, imageData) {
+
+    console.log("querying");
     connection.query('INSERT INTO images SET ?', imageData, function(err, result) {
-        if (!err)
+        if (!err) {
             console.log('The result is: ', result);
-        else
+            res.send(200);
+        } else {
             console.log('Error while performing image data insert to DB.' + err);
+            res.send(500)
+        }
     });
 };
 
@@ -52,12 +57,16 @@ var writeToDatabaseLog = function (comment) {
 };
 
 connection.connect();
-writeToDatabaseLog("Server was exectuted.");
-printAllLogData();
-connection.end();
+writeToDatabaseLog("Server was executed.");
 
 app.get('/', function (req, res) {
     res.sendfile('assets/pages/index.html');
+});
+
+app.post('/addImageData', function (req, res) {
+    printAllImageData();
+    console.log("Post received.");
+    addImageDataToDB(res, req.body);
 });
 
 var port = process.env.PORT || 3000;
