@@ -25,16 +25,15 @@ var printAllImageData = function () {
 };
 
 var addImageDataToDB = function (res, imageData) {
-
-    console.log("querying");
-    connection.query('INSERT INTO images SET ?', imageData, function(err, result) {
-        if (!err) {
-            console.log('The result is: ', result);
-            res.send(200);
-        } else {
-            console.log('Error while performing image data insert to DB.' + err);
-            res.send(500)
-        }
+    return new Promise(function(resolve, reject){
+        connection.query('INSERT INTO images SET ?', imageData, function(err, result) {
+            if (err) {
+                reject(err);
+            } else {
+                writeToDatabaseLog("Image data was added.");
+                resolve(result);
+            }
+        });
     });
 };
 
@@ -50,7 +49,7 @@ var printAllLogData = function () {
 var writeToDatabaseLog = function (comment) {
     connection.query('INSERT INTO log SET ?', {comment: comment}, function(err, result) {
         if (!err)
-            console.log('The result is: ', result);
+            console.log('LOG COMMENT ADDED: ' + comment);
         else
             console.log('Error while performing log insert.');
     });
@@ -64,9 +63,12 @@ app.get('/', function (req, res) {
 });
 
 app.post('/addImageData', function (req, res) {
-    printAllImageData();
-    console.log("Post received.");
-    addImageDataToDB(res, req.body);
+    addImageDataToDB(res, req.body)
+        .then(function(){
+            res.send(200);
+        }, function(){
+            res.send(500);
+        });
 });
 
 var port = process.env.PORT || 3000;
