@@ -1,0 +1,14 @@
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+cloudinary.config( 
+  cloud_name = "***REMOVED***", 
+  api_key = "***REMOVED***", 
+  api_secret = "ku9oj6X9qn5Ly8z7gSlmu_bYdBM" 
+)
+
+
+imageUploadResult = cloudinary.uploader.upload("github.png")
+
+print(imageUploadResult)
