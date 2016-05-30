@@ -1,12 +1,13 @@
+import cloudinaryConfig
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 import requests
 
 cloudinary.config( 
-  cloud_name = "***REMOVED***", 
-  api_key = "***REMOVED***", 
-  api_secret = "***REMOVED***" 
+  cloud_name = cloudinaryConfig.configData["cloud_name"],
+  api_key = cloudinaryConfig.configData["api_key"],
+  api_secret = cloudinaryConfig.configData["api_secret"]
 )
 userInput = ""
 while userInput != "exit":
