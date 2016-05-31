@@ -3,6 +3,7 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 import requests
+import base64
 
 cloudinary.config( 
   cloud_name = cloudinaryConfig.configData["cloud_name"],
@@ -12,20 +13,9 @@ cloudinary.config(
 userInput = ""
 while userInput != "exit":
     try:
-        imageUploadResult = cloudinary.uploader.upload("testImages/requests.png")
-
-        imageData = {
-            "public_id": imageUploadResult["public_id"],
-            "version": imageUploadResult["version"],
-            "width": imageUploadResult["width"],
-            "height": imageUploadResult["height"],
-            "format": imageUploadResult["format"],
-            "bytes": imageUploadResult["bytes"],
-            "url": imageUploadResult["url"],
-            "secure_url": imageUploadResult["secure_url"]
-            }
-
-        response = requests.post('http://localhost:3000/addImageData', data = imageData)
+        with open("testImages/image.jpg", "rb") as imageFile:
+            base64Image = base64.b64encode(imageFile.read())
+        response = requests.post('http://localhost:3000/addImageData', data={"image": base64Image})
 
         print (response)
     except:

@@ -3,10 +3,17 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var mysql = Promise.promisifyAll(require('mysql'));
+var cloudinary = require('cloudinary');
 
 app.use(express.static('assets'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+
+cloudinary.config({
+    cloud_name: process.env.cloudinary_cloud_name,
+    api_key: process.env.cloudinary_api_key,
+    api_secret: process.env.cloudinary_api_secret
+});
 
 var connection = mysql.createConnection({
     host     : 'localhost',
@@ -21,6 +28,12 @@ var printAllImageData = function () {
             console.log('The solution is: ', rows);
         else
             console.log('Error while performing Query.');
+    });
+};
+
+var uploadImageToCloudinary = function(image) {
+    cloudinary.uploader.upload("data:image/jpg;base64," + image, function(result) {
+        console.log(result);
     });
 };
 
@@ -63,6 +76,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/addImageData', function (req, res) {
+    uploadImageToCloudinary(req.body.image);
     addImageDataToDB(res, req.body)
         .then(function(){
             res.send(200);
