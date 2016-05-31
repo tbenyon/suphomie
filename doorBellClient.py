@@ -1,15 +1,9 @@
-import cloudinaryConfig
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 import requests
 import base64
 
-cloudinary.config( 
-  cloud_name = cloudinaryConfig.configData["cloud_name"],
-  api_key = cloudinaryConfig.configData["api_key"],
-  api_secret = cloudinaryConfig.configData["api_secret"]
-)
 userInput = ""
 while userInput != "exit":
     try:
