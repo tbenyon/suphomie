@@ -32,15 +32,35 @@ var printAllImageData = function () {
 };
 
 var uploadImageToCloudinary = function(image) {
-    cloudinary.uploader.upload("data:image/jpg;base64," + image, function(result) {
-        console.log(result);
+    return new Promise(function(resolve, reject) {
+        cloudinary.uploader.upload("data:image/jpg;base64," + image, function (result) {
+            if ('Error' in result) {
+                console.log("ERROR: Uploading to Cloudinary failed.");
+                reject("Error when uploading to Cloudinary.")
+            } else {
+                writeToDatabaseLog("Image file was uploaded to Cloudinary.");
+                resolve(result);
+            }
+        });
     });
 };
 
-var addImageDataToDB = function (res, imageData) {
+var addImageDataToDB = function (rawImageData) {
+    var imageData = {
+        imageID: rawImageData.imageID,
+        public_id: rawImageData.public_id,
+        version: rawImageData.version,
+        width: rawImageData.width,
+        height: rawImageData.height,
+        format: rawImageData.format,
+        bytes: rawImageData.bytes,
+        url: rawImageData.url,
+        secure_url: rawImageData.secure_url
+    };
     return new Promise(function(resolve, reject){
         connection.query('INSERT INTO images SET ?', imageData, function(err, result) {
             if (err) {
+                console.log("ERROR: " + err);
                 reject(err);
             } else {
                 writeToDatabaseLog("Image data was added.");
@@ -62,7 +82,7 @@ var printAllLogData = function () {
 var writeToDatabaseLog = function (comment) {
     connection.query('INSERT INTO log SET ?', {comment: comment}, function(err, result) {
         if (!err)
-            console.log('LOG COMMENT ADDED: ' + comment);
+            console.log('DB LOG: ' + comment);
         else
             console.log('Error while performing log insert.');
     });
@@ -76,8 +96,10 @@ app.get('/', function (req, res) {
 });
 
 app.post('/addImageData', function (req, res) {
-    uploadImageToCloudinary(req.body.image);
-    addImageDataToDB(res, req.body)
+    uploadImageToCloudinary(req.body.image)
+        .then(function(rawData) {
+            return addImageDataToDB(rawData)
+        })
         .then(function(){
             res.send(200);
         }, function(){
