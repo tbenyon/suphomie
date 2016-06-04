@@ -16,10 +16,10 @@ cloudinary.config({
 });
 
 var connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'testUser',
-    password : 'password',
-    database : 'suphomie'
+    host     : process.env.mySQL_host,
+    user     : process.env.mySQL_user,
+    password : process.env.mySQL_password,
+    database : process.env.mySQL_database
 });
 
 var printAllImageData = function () {
