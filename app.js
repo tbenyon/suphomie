@@ -6,8 +6,8 @@ var mysql = Promise.promisifyAll(require('mysql'));
 var cloudinary = require('cloudinary');
 
 app.use(express.static('assets'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json({limit: '20mb'}));
+app.use(bodyParser.urlencoded({extended: true, limit: '20mb'}));
 
 cloudinary.config({
     cloud_name: process.env.cloudinary_cloud_name,
