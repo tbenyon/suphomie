@@ -35,7 +35,7 @@ var uploadImageToCloudinary = function(image) {
     return new Promise(function(resolve, reject) {
         cloudinary.uploader.upload("data:image/jpg;base64," + image, function (result) {
             if ('Error' in result) {
-                console.log("ERROR: Uploading to Cloudinary failed.");
+                writeToDatabaseLog("ERROR: Uploading to Cloudinary failed.");
                 reject("Error when uploading to Cloudinary.")
             } else {
                 writeToDatabaseLog("Image file was uploaded to Cloudinary.");
@@ -60,7 +60,7 @@ var addImageDataToDB = function (rawImageData) {
     return new Promise(function(resolve, reject){
         connection.query('INSERT INTO images SET ?', imageData, function(err, result) {
             if (err) {
-                console.log("ERROR: " + err);
+                writeToDatabaseLog("ERROR: Failed to insert image data in DB." + err);
                 reject(err);
             } else {
                 writeToDatabaseLog("Image data was added.");
@@ -96,6 +96,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/addImageData', function (req, res) {
+    writeToDatabaseLog("Image post request made.");
     uploadImageToCloudinary(req.body.image)
         .then(function(rawData) {
             return addImageDataToDB(rawData)
