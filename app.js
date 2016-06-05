@@ -15,14 +15,16 @@ cloudinary.config({
     api_secret: process.env.cloudinary_api_secret
 });
 
-var connection = mysql.createConnection({
+var pool = mysql.createPool({
+    connectionLimit: 100,
     host     : process.env.mySQL_host,
     user     : process.env.mySQL_user,
     password : process.env.mySQL_password,
-    database : process.env.mySQL_database
+    database : process.env.mySQL_database,
+    debug    : false
 });
 
-var printAllImageData = function () {
+var printAllImageData = function (connection) {
     connection.query('SELECT * from images', function(err, rows, fields) {
         if (!err)
             console.log('The solution is: ', rows);
@@ -31,21 +33,21 @@ var printAllImageData = function () {
     });
 };
 
-var uploadImageToCloudinary = function(image) {
+var uploadImageToCloudinary = function(image, connection) {
     return new Promise(function(resolve, reject) {
         cloudinary.uploader.upload("data:image/jpg;base64," + image, function (result) {
             if ('Error' in result) {
-                writeToDatabaseLog("ERROR: Uploading to Cloudinary failed.");
+                writeToDatabaseLog("ERROR: Uploading to Cloudinary failed.", connection);
                 reject("Error when uploading to Cloudinary.")
             } else {
-                writeToDatabaseLog("Image file was uploaded to Cloudinary.");
+                writeToDatabaseLog("Image file was uploaded to Cloudinary.", connection);
                 resolve(result);
             }
         });
     });
 };
 
-var addImageDataToDB = function (rawImageData) {
+var addImageDataToDB = function (rawImageData, connection) {
     var imageData = {
         imageID: rawImageData.imageID,
         public_id: rawImageData.public_id,
@@ -60,17 +62,17 @@ var addImageDataToDB = function (rawImageData) {
     return new Promise(function(resolve, reject){
         connection.query('INSERT INTO images SET ?', imageData, function(err, result) {
             if (err) {
-                writeToDatabaseLog("ERROR: Failed to insert image data in DB." + err);
+                writeToDatabaseLog("ERROR: Failed to insert image data in DB." + err, connection);
                 reject(err);
             } else {
-                writeToDatabaseLog("Image data was added.");
+                writeToDatabaseLog("Image data was added.", connection);
                 resolve(result);
             }
         });
     });
 };
 
-var printAllLogData = function () {
+var printAllLogData = function (connection) {
     connection.query('SELECT * from log', function (err, rows, fields) {
         if (!err)
             console.log('The solution is: ', rows);
@@ -79,7 +81,7 @@ var printAllLogData = function () {
     });
 };
 
-var writeToDatabaseLog = function (comment) {
+var writeToDatabaseLog = function (comment, connection) {
     connection.query('INSERT INTO log SET ?', {comment: comment}, function(err, result) {
         if (!err)
             console.log('DB LOG: ' + comment);
@@ -88,24 +90,38 @@ var writeToDatabaseLog = function (comment) {
     });
 };
 
-connection.connect();
-writeToDatabaseLog("Server was executed.");
-
 app.get('/', function (req, res) {
     res.sendfile('assets/pages/index.html');
 });
 
 app.post('/addImageData', function (req, res) {
-    writeToDatabaseLog("Image post request made.");
-    uploadImageToCloudinary(req.body.image)
-        .then(function(rawData) {
-            return addImageDataToDB(rawData)
-        })
-        .then(function(){
-            res.send(200);
-        }, function(){
-            res.send(500);
+    pool.getConnection(function(err,connection){
+        if (err) {
+            connection.release();
+            res.json({"code" : 100, "status" : "Error in connection database"});
+            return;
+        }
+
+        writeToDatabaseLog("Image post request made with ID:" + connection.threadId, connection);
+
+        uploadImageToCloudinary(req.body.image, connection)
+            .then(function(rawData) {
+                return addImageDataToDB(rawData, connection)
+            })
+            .then(function(){
+                connection.release();
+                res.send(200);
+            }, function(){
+                connection.release();
+                res.send(500);
+            });
+
+        connection.on('error', function(err) {
+            res.json({"code" : 100, "status" : "Error in connection database"});
+            return;
         });
+    });
+
 });
 
 var port = process.env.PORT || 3000;
