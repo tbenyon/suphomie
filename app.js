@@ -4,6 +4,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var mysql = Promise.promisifyAll(require('mysql'));
 var cloudinary = require('cloudinary');
+var request = require('request');
 
 app.use(express.static('assets'));
 app.use(bodyParser.json({limit: '20mb'}));
@@ -66,7 +67,7 @@ var addImageDataToDB = function (rawImageData, connection) {
                 reject(err);
             } else {
                 writeToDatabaseLog("Image data was added.", connection);
-                resolve(result);
+                resolve(imageData.url);
             }
         });
     });
@@ -90,6 +91,25 @@ var writeToDatabaseLog = function (comment, connection) {
     });
 };
 
+var notifyIFTTTofImageCapture = function(imageURL, connection) {
+    return new Promise(function (resolve, reject) {
+        request({
+            url: 'https://maker.ifttt.com/trigger/front_door_bell/with/key/' + process.env.IFTTT_key,
+            method: 'POST',
+            json: {value1: imageURL}
+        },
+        function (error, response, body) {
+            if (!error) {
+                writeToDatabaseLog("Successful IFTTT notification sent: ", connection);
+                resolve(body);
+            } else {
+                writeToDatabaseLog("Post request to IFTTT failed: " + error, connection);
+                reject("Post request to IFTTT failed: " + error)
+            }
+        });
+    });
+};
+
 app.get('/', function (req, res) {
     res.sendfile('assets/pages/index.html');
 });
@@ -107,8 +127,9 @@ app.post('/addImageData', function (req, res) {
         uploadImageToCloudinary(req.body.image, connection)
             .then(function(rawData) {
                 return addImageDataToDB(rawData, connection)
-            })
-            .then(function(){
+            }).then(function(imageURL) {
+                return notifyIFTTTofImageCapture(imageURL, connection)
+            }).then(function(){
                 connection.release();
                 res.send(200);
             }, function(){
