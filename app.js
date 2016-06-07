@@ -131,10 +131,10 @@ app.post('/addImageData', function (req, res) {
                 return notifyIFTTTofImageCapture(imageURL, connection)
             }).then(function(){
                 connection.release();
-                res.send(200);
+                res.sendStatus(200);
             }, function(){
                 connection.release();
-                res.send(500);
+                res.sendStatus(500);
             });
 
         connection.on('error', function(err) {
