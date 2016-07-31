@@ -117,7 +117,7 @@ app.get('/', function (req, res) {
 app.post('/addImageData', function (req, res) {
     pool.getConnection(function(err,connection){
         if (err) {
-            connection.release();
+            connection.destroy();
             res.json({"code" : 100, "status" : "Error in connection database"});
             return;
         }
@@ -130,15 +130,15 @@ app.post('/addImageData', function (req, res) {
             }).then(function(imageURL) {
                 return notifyIFTTTofImageCapture(imageURL, connection)
             }).then(function(){
-                connection.release();
+                connection.destroy();
                 res.send(200);
             }, function(){
-                connection.release();
+                connection.destroy();
                 res.send(500);
             });
 
         connection.on('error', function(err) {
-            res.json({"code" : 100, "status" : "Error in connection database"});
+            console.log("Error with connection:" + connection.threadId);
             return;
         });
     });
