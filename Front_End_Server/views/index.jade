@@ -7,3 +7,14 @@ if (!user)
 else
     h2
         = "Hello, " + user + "."
+
+    p= 'Not you? Click '
+        a(href = '/logout') here
+        = " to sign out."
+
+h3= 'Click '
+    a(href = '/account') here
+    = ' to see secrets for only Github members!'
+
+if (secretMessage)
+    h1= 'The secret message is:\n' + secretMessage

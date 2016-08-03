@@ -79,7 +79,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/account', ensureAuthenticated, function(req, res){
-  res.render('account', { user: req.user });
+  res.render('index.jade', { user: req.user.displayName, secretMessage: "The cake is a lie!"});
 });
 
 app.get('/login', function(req, res){
@@ -131,5 +131,5 @@ var server = app.listen(port, function () {
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
+    res.render('index.jade', {secretMessage: "NONE OF YOUR BUSINESS!"});
 }
