@@ -56,8 +56,7 @@ passport.use(new GitHubStrategy({
 var app = express();
 
 // configure Express
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
+app.set('view engine', 'pug');
 app.use(partials());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -71,7 +70,11 @@ app.use(express.static(__dirname + '/public'));
 
 
 app.get('/', function(req, res){
-  res.render('index', { user: req.user });
+    if (typeof req.user === 'undefined') {
+        res.render('index.jade');
+    } else {
+        res.render('index.jade', {user: req.user.displayName});
+    }
 });
 
 app.get('/account', ensureAuthenticated, function(req, res){
