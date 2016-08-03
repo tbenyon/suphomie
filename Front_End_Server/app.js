@@ -68,6 +68,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(__dirname + '/public'));
 
+app.use('/assets', express.static(__dirname + '/assets'));
 
 app.get('/', function(req, res){
     if (typeof req.user === 'undefined') {

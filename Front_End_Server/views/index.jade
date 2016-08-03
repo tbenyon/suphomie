@@ -2,12 +2,8 @@ h1 'Sup Homie
 if (!user)
     h2 You are not logged in!
 
-    p   Click
-        a(href="google.com") here
-        |to login.
-
-    a(href="/auth/github") Login with GitHub
-
+    a(href="/auth/github")
+        img(src='assets/images/githubLogin.png')
 else
     h2
         = "Hello, " + user + "."
