@@ -1,1 +1,1 @@
-web: bin/web
+web: node /Front_End_Server
