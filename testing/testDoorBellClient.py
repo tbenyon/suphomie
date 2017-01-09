@@ -7,9 +7,9 @@ import base64
 userInput = ""
 while userInput != "exit":
     try:
-        with open("../testImages/image.jpg", "rb") as imageFile:
+        with open("./testImages/image.jpg", "rb") as imageFile:
             base64Image = base64.b64encode(imageFile.read())
-        response = requests.post('http://localhost:3000/addImageData', data={"image": base64Image})
+        response = requests.post('http://localhost:3000/media/addImageData', data={"image": base64Image})
 
         print (response)
     except Exception as e:
