@@ -1,5 +1,5 @@
-var request = require('request');
-var database = require('./../database/database.js');
+const request = require('request');
+const database = require('./../database/database.js');
 
 exports.notifyIFTTTofImageCapture = function(imageURL, connection) {
     return new Promise(function (resolve, reject) {

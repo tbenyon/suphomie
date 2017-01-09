@@ -1,6 +1,6 @@
-var mysql = require('mysql');
+const mysql = require('mysql');
 
-var pool = mysql.createPool({
+const pool = mysql.createPool({
     connectionLimit: 100,
     host     : process.env.mySQL_host,
     user     : process.env.mySQL_user,
@@ -46,7 +46,7 @@ exports.printAllImageData = function (connection) {
 };
 
 exports.addImageDataToDB = function (rawImageData, connection) {
-    var imageData = {
+    const imageData = {
         imageID: rawImageData.imageID,
         public_id: rawImageData.public_id,
         version: rawImageData.version,
@@ -91,7 +91,7 @@ exports.writeToDatabaseLog = function (comment, connection) {
 };
 
 
-var writeToDatabaseLog = function (comment, connection) {
+const writeToDatabaseLog = function (comment, connection) {
     return new Promise(function (resolve, reject) {
         connection.query('INSERT INTO log SET ?', {comment: comment}, function(err, result) {
             if (!err)

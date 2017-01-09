@@ -1,12 +1,12 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var database = require('./../modules/database/database.js');
-var cloudinary = require('./../modules/cloudinary/cloudinary.js');
-var ifttt = require('./../modules/ifttt/ifttt.js');
+const database = require('./../modules/database/database.js');
+const cloudinary = require('./../modules/cloudinary/cloudinary.js');
+const ifttt = require('./../modules/ifttt/ifttt.js');
 
 router.post('/addImageData', function (req, res) {
-    var dbConnection;
+    let dbConnection;
 
     database.makeConnection().then(function (conn) {
         dbConnection = conn;

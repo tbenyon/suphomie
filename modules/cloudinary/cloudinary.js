@@ -1,6 +1,6 @@
-var cloudinary = require('cloudinary');
+const cloudinary = require('cloudinary');
 
-var database = require('./../database/database.js');
+const database = require('./../database/database.js');
 
 cloudinary.config({
     cloud_name: process.env.cloudinary_cloud_name,
