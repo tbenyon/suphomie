@@ -117,7 +117,9 @@ app.get('/', function (req, res) {
 app.post('/addImageData', function (req, res) {
     pool.getConnection(function(err,connection){
         if (err) {
-            connection.release();
+            if (connection) {
+                connection.release();
+            }
             res.json({"code" : 100, "status" : "Error in connection database"});
             return;
         }
