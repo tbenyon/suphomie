@@ -19,11 +19,11 @@ router.post('/addImageData', function (req, res) {
         return ifttt.notifyIFTTTofImageCapture(imageURL, dbConnection)
     }).then(function(){
         database.dropConnection(dbConnection);
-        res.send(200);
+        res.sendStatus(200);
     }).catch(function(err){
         database.dropConnection(dbConnection);
         console.log(err);
-        res.send(500);
+        res.sendStatus(500);
     });
 });
 
