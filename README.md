@@ -1,3 +1,4 @@
+[![Build Status](https://app.snap-ci.com/tbenyon/suphomie/branch/master/build_image)](https://app.snap-ci.com/tbenyon/suphomie/branch/master)
 # Sup Homie
 
 This is the start of a home automation service.
