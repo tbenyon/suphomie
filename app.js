@@ -7,6 +7,7 @@ app.use(bodyParser.json({limit: '20mb'}));
 app.use(bodyParser.urlencoded({extended: true, limit: '20mb'}));
 
 app.use("/media",require('./routes/mediaRoutes.js'));
+app.use("/heating",require('./routes/centralHeatingRoutes.js'));
 
 app.get('/', function (req, res) {
     res.sendfile('assets/pages/index.html');
