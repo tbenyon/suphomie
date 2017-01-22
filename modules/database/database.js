@@ -34,7 +34,18 @@ exports.dropConnection = function(connection) {
     connection.release();
 };
 
-
+exports.makeQuery = function(connection, queryString) {
+    return new Promise(function (resolve, reject) {
+        connection.query(queryString, function (err, rows) {
+            if (!err) {
+                console.log(JSON.stringify(rows));
+                resolve(rows);
+            } else {
+                reject('Error while performing Query.');
+            }
+        });
+    });
+};
 
 exports.printAllImageData = function (connection) {
     connection.query('SELECT * from images', function(err, rows, fields) {
